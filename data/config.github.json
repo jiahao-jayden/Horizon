@@ -1,150 +1,167 @@
 {
   "version": "1.0",
   "ai": {
-    "provider": "deepseek",
-    "model": "deepseek-v4-flash",
-    "base_url": "https://api.deepseek.com",
-    "api_key_env": "DEEPSEEK_API_KEY",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "api_key_env": "OPENAI_API_KEY",
     "temperature": 0.3,
-    "max_tokens": 8192,
+    "max_tokens": 4096,
     "throttle_sec": 1,
-    "languages": [
-      "zh",
-      "en"
-    ],
-    "analysis_concurrency": 5,
-    "enrichment_concurrency": 5
+    "analysis_concurrency": 2,
+    "enrichment_concurrency": 2
   },
   "sources": {
-    "github": [
+    "rss": [
       {
-        "type": "user_events",
-        "username": "karpathy",
-        "enabled": true
+        "name": "OpenAI Blog",
+        "url": "https://openai.com/news/rss.xml",
+        "enabled": true,
+        "category": "ai-lab"
       },
       {
-        "type": "repo_releases",
-        "owner": "vllm-project",
-        "repo": "vllm",
-        "enabled": true
+        "name": "Anthropic Blog",
+        "url": "https://www.anthropic.com/rss.xml",
+        "enabled": true,
+        "category": "ai-lab"
       },
       {
-        "type": "repo_releases",
-        "owner": "sgl-project",
-        "repo": "sglang",
-        "enabled": true
+        "name": "Latent Space",
+        "url": "https://www.latent.space/feed",
+        "enabled": true,
+        "category": "ai-podcast"
       },
       {
-        "type": "repo_releases",
-        "owner": "triton-lang",
-        "repo": "triton",
-        "enabled": true
+        "name": "Google DeepMind Podcast",
+        "url": "https://feeds.simplecast.com/JT6pbPkg",
+        "enabled": true,
+        "category": "ai-podcast"
+      },
+      {
+        "name": "No Priors",
+        "url": "https://feeds.megaphone.fm/nopriors",
+        "enabled": true,
+        "category": "ai-podcast"
+      },
+      {
+        "name": "Unsupervised Learning (Redpoint)",
+        "url": "https://feeds.simplecast.com/dOSE_bdP",
+        "enabled": true,
+        "category": "ai-podcast"
+      },
+      {
+        "name": "Training Data (Sequoia)",
+        "url": "https://feeds.megaphone.fm/trainingdata",
+        "enabled": true,
+        "category": "ai-podcast"
+      },
+      {
+        "name": "a16z AI Podcast",
+        "url": "https://feeds.simplecast.com/Hb_IuXOo",
+        "enabled": true,
+        "category": "ai-podcast"
+      },
+      {
+        "name": "The AI Daily Brief",
+        "url": "https://anchor.fm/s/f7cac464/podcast/rss",
+        "enabled": true,
+        "category": "ai-podcast"
+      },
+      {
+        "name": "Lightcone Podcast (YC)",
+        "url": "https://anchor.fm/s/f58d3330/podcast/rss",
+        "enabled": true,
+        "category": "ai-podcast"
+      },
+      {
+        "name": "Minus One (South Park Commons)",
+        "url": "https://anchor.fm/s/f91eac68/podcast/rss",
+        "enabled": true,
+        "category": "ai-podcast"
+      },
+      {
+        "name": "The Logan Bartlett Show",
+        "url": "https://feeds.simplecast.com/soHIfHVn",
+        "enabled": true,
+        "category": "interview"
+      },
+      {
+        "name": "Lex Fridman Podcast",
+        "url": "https://lexfridman.com/feed/podcast/",
+        "enabled": true,
+        "category": "interview"
+      },
+      {
+        "name": "Dwarkesh Podcast",
+        "url": "https://www.dwarkesh.com/feed",
+        "enabled": true,
+        "category": "interview"
+      },
+      {
+        "name": "Lenny's Podcast",
+        "url": "https://www.lennysnewsletter.com/feed",
+        "enabled": true,
+        "category": "product"
+      },
+      {
+        "name": "Peter Yang (Behind the Craft)",
+        "url": "https://creatoreconomy.so/feed",
+        "enabled": true,
+        "category": "product"
+      },
+      {
+        "name": "AI and I (Every)",
+        "url": "https://every.to/podcast/feed.xml",
+        "enabled": true,
+        "category": "ai-podcast"
+      },
+      {
+        "name": "Every (Chain of Thought)",
+        "url": "https://every.to/feed",
+        "enabled": true,
+        "category": "newsletter"
+      },
+      {
+        "name": "One Useful Thing (Ethan Mollick)",
+        "url": "https://www.oneusefulthing.org/feed",
+        "enabled": true,
+        "category": "newsletter"
       }
     ],
     "hackernews": {
-      "enabled": true,
-      "fetch_top_stories": 30,
-      "min_score": 150
+      "enabled": false
     },
-    "rss": [
-      {
-        "name": "Simon Willison",
-        "url": "https://simonwillison.net/atom/everything/",
-        "enabled": true,
-        "category": "ai-tools"
-      },
-      {
-        "name": "GitHub Trending - Daily",
-        "url": "https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml",
-        "enabled": true,
-        "category": "github-trending"
-      },
-      {
-        "name": "Semianalysis",
-        "url": "https://newsletter.semianalysis.com/feed",
-        "enabled": true,
-        "category": "semiconductors"
-      },
-      {
-        "name": "LWN.net",
-        "url": "https://lwn.net/headlines/full_text?key=${LWN_KEY}",
-        "enabled": true,
-        "category": "linux-kernel"
-      }
-    ],
     "reddit": {
-      "enabled": true,
-      "subreddits": [
-        {
-          "subreddit": "MachineLearning",
-          "enabled": true,
-          "sort": "hot",
-          "time_filter": "day",
-          "fetch_limit": 10,
-          "min_score": 60
-        },
-        {
-          "subreddit": "LocalLLaMA",
-          "enabled": true,
-          "sort": "hot",
-          "time_filter": "day",
-          "fetch_limit": 10,
-          "min_score": 60
-        }
-      ],
-      "users": [],
-      "fetch_comments": 10
+      "enabled": false
     },
-    "telegram": {
-      "enabled": true,
-      "channels": [
-        {
-          "channel": "zaihuapd",
-          "enabled": true,
-          "fetch_limit": 20
-        }
-      ]
+    "twitter": {
+      "enabled": false
+    },
+    "github": {
+      "enabled": false
+    },
+    "openbb": {
+      "enabled": false
+    },
+    "ossinsight": {
+      "enabled": false
     }
   },
   "filtering": {
-    "ai_score_threshold": 8.0,
-    "time_window_hours": 24
+    "ai_score_threshold": 6.0,
+    "time_window_hours": 48,
+    "max_items": null,
+    "category_groups": {
+      "ai-lab": null,
+      "ai-podcast": null,
+      "interview": null,
+      "newsletter": null,
+      "product": null
+    }
   },
   "webhook": {
-    "enabled": true,
-    "url_env": "HORIZON_WEBHOOK_URL",
-    "delivery": "summary_and_items",
-    "overview_position": "last",
-    "platform": "feishu",
-    "layout": "collapsible",
-    "fallback_layout": "markdown",
-    "languages": [
-      "zh"
-    ],
-    "request_body": {
-      "msg_type": "interactive",
-      "card": {
-        "schema": "2.0",
-        "config": {
-          "wide_screen_mode": true
-        },
-        "header": {
-          "title": {
-            "tag": "plain_text",
-            "content": "#{message_title}"
-          },
-          "template": "blue"
-        },
-        "body": {
-          "elements": [
-            {
-              "tag": "markdown",
-              "content": "#{summary}"
-            }
-          ]
-        }
-      }
-    },
-    "headers": ""
+    "enabled": false
+  },
+  "email": {
+    "enabled": false
   }
 }
