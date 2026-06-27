@@ -1,10 +1,13 @@
 """Main orchestrator coordinating the entire workflow."""
 
 import asyncio
+import json
+import os
+import subprocess
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Set
 from urllib.parse import urlparse
 import httpx
 from rich.console import Console
@@ -60,6 +63,34 @@ class HorizonOrchestrator:
             else None
         )
 
+    _SEEN_IDS_FILE = "data/seen_ids.json"
+    _MAX_SEEN = 5000  # cap to avoid unbounded growth
+
+    def _load_seen_ids(self) -> Set[str]:
+        try:
+            if os.path.exists(self._SEEN_IDS_FILE):
+                with open(self._SEEN_IDS_FILE) as f:
+                    return set(json.load(f).get("ids", []))
+        except Exception:
+            pass
+        return set()
+
+    def _save_seen_ids(self, old_ids: Set[str], new_ids: Set[str]) -> None:
+        all_ids = list(old_ids | new_ids)[-self._MAX_SEEN:]
+        os.makedirs("data", exist_ok=True)
+        with open(self._SEEN_IDS_FILE, "w") as f:
+            json.dump({"ids": all_ids, "updated_at": datetime.now(timezone.utc).isoformat()}, f)
+        try:
+            subprocess.run(["git", "config", "user.email", "horizon-bot@github.com"], check=False, capture_output=True)
+            subprocess.run(["git", "config", "user.name", "Horizon Bot"], check=False, capture_output=True)
+            subprocess.run(["git", "add", self._SEEN_IDS_FILE], check=False, capture_output=True)
+            diff = subprocess.run(["git", "diff", "--cached", "--quiet"], capture_output=True)
+            if diff.returncode != 0:
+                subprocess.run(["git", "commit", "-m", "chore: update seen-items dedup state [skip ci]"], check=False, capture_output=True)
+                subprocess.run(["git", "push"], check=False, capture_output=True)
+        except Exception as e:
+            self.console.print(f"[yellow]Warning: could not persist seen IDs: {e}[/yellow]")
+
     async def run(self, force_hours: int = None) -> None:
         """Execute the complete workflow.
 
@@ -98,6 +129,20 @@ class HorizonOrchestrator:
                     f"🔗 Merged {len(all_items) - len(merged_items)} cross-source duplicates "
                     f"→ {len(merged_items)} unique items\n"
                 )
+
+            # 3.5 Cross-run deduplication: skip items already analyzed in previous runs
+            seen_ids = self._load_seen_ids()
+            new_items = [item for item in merged_items if item.id not in seen_ids]
+            if len(new_items) < len(merged_items):
+                self.console.print(
+                    f"⏭️  Skipped {len(merged_items) - len(new_items)} already-seen items "
+                    f"→ {len(new_items)} new\n"
+                )
+            merged_items = new_items
+
+            if not merged_items:
+                self.console.print("[yellow]No new unseen content found. Exiting.[/yellow]")
+                return
 
             # 4. Analyze with AI
             analyzed_items = await self._analyze_content(merged_items)
@@ -207,6 +252,9 @@ class HorizonOrchestrator:
                     )
 
             self.console.print("[bold green]✅ Horizon completed successfully![/bold green]")
+
+            # Persist seen IDs for next run's deduplication
+            self._save_seen_ids(seen_ids, {item.id for item in analyzed_items})
             usage = get_usage_snapshot()
             if usage.total_tokens > 0:
                 self.console.print(
