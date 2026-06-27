@@ -10,7 +10,6 @@
     "analysis_concurrency": 2,
     "enrichment_concurrency": 2,
     "languages": [
-      "en",
       "zh"
     ]
   },
