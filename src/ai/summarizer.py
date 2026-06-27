@@ -115,7 +115,7 @@ class DailySummarizer:
             score = item.ai_score or "?"
             toc_entries.append(f"{i + 1}. [{t}](#item-{i + 1}) ⭐️ {score}/10")
         if github_items:
-            toc_entries.append(f"\n## [🔥 {labels['github_trending']}](#github-trending)\n")
+            toc_entries.append(f"{len(render_items) + 1}. [🔥 {labels['github_trending']}](#github-trending)")
         toc = "\n".join(toc_entries) + "\n\n---\n\n"
 
         parts = [self._format_item(item, labels, language, i + 1) for i, item in enumerate(render_items)]
