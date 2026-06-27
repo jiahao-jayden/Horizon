@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "ai": {
-    "provider": "anthropic",
-    "model": "claude-haiku-4-5-20251001",
-    "api_key_env": "ANTHROPIC_API_KEY",
+    "provider": "openai",
+    "model": "gpt-5.5",
+    "api_key_env": "OPENAI_API_KEY",
     "temperature": 0.3,
     "max_tokens": 4096,
     "throttle_sec": 0,
