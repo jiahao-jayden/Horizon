@@ -149,11 +149,16 @@ class HorizonOrchestrator:
             self.console.print(f"🤖 Analyzed {len(analyzed_items)} items with AI\n")
 
             # 5. Filter by score threshold
+            # GitHub trending 项目没有文章正文，AI 评分常偏低，全部保留
             threshold = self.config.filtering.ai_score_threshold
-            important_items = [
-                item for item in analyzed_items
-                if item.ai_score and item.ai_score >= threshold
-            ]
+            important_items = []
+            for item in analyzed_items:
+                if item.source_type.value == "ossinsight":
+                    if item.ai_score is not None:
+                        important_items.append(item)
+                else:
+                    if item.ai_score and item.ai_score >= threshold:
+                        important_items.append(item)
             important_items.sort(key=lambda x: x.ai_score or 0, reverse=True)
 
             self.console.print(
@@ -600,7 +605,11 @@ class HorizonOrchestrator:
             group_counts[group_key] += 1
 
         if max_items is not None:
-            selected = selected[:max_items]
+            # GitHub trending 项目单独保留，不受 max_items 截断影响
+            main_selected = [(it, g) for it, g in selected if it.source_type.value != "ossinsight"]
+            oss_selected  = [(it, g) for it, g in selected if it.source_type.value == "ossinsight"]
+            main_selected = main_selected[:max_items]
+            selected = main_selected + oss_selected
 
         final_counts: Dict[str, int] = defaultdict(int)
         for _, group_key in selected:
