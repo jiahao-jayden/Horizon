@@ -174,13 +174,8 @@
         "TypeScript",
         "Rust"
       ],
-      "keywords": [
-        "ai",
-        "llm",
-        "agent",
-        "ml"
-      ],
-      "min_stars": 50,
+      "keywords": [],
+      "min_stars": 30,
       "max_items": 20
     }
   },
