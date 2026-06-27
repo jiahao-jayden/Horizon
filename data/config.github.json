@@ -128,10 +128,32 @@
       }
     ],
     "hackernews": {
-      "enabled": false
+      "enabled": true,
+      "fetch_top_stories": 20,
+      "min_score": 150
     },
     "reddit": {
-      "enabled": false
+      "enabled": true,
+      "subreddits": [
+        {
+          "subreddit": "MachineLearning",
+          "enabled": true,
+          "sort": "hot",
+          "time_filter": "day",
+          "fetch_limit": 10,
+          "min_score": 100
+        },
+        {
+          "subreddit": "LocalLLaMA",
+          "enabled": true,
+          "sort": "hot",
+          "time_filter": "day",
+          "fetch_limit": 10,
+          "min_score": 50
+        }
+      ],
+      "users": [],
+      "fetch_comments": 0
     },
     "twitter": {
       "enabled": false
