@@ -128,6 +128,36 @@
         "url": "https://every.to/superorganizers/feed.xml",
         "enabled": true,
         "category": "newsletter"
+      },
+      {
+        "name": "Import AI (Jack Clark)",
+        "url": "https://importai.substack.com/feed",
+        "enabled": true,
+        "category": "newsletter"
+      },
+      {
+        "name": "Stratechery (Ben Thompson)",
+        "url": "https://stratechery.com/feed",
+        "enabled": true,
+        "category": "newsletter"
+      },
+      {
+        "name": "Techmeme",
+        "url": "http://www.techmeme.com/feed.xml",
+        "enabled": true,
+        "category": "ai-lab"
+      },
+      {
+        "name": "Simon Willison Blog",
+        "url": "https://simonwillison.net/atom/entries/",
+        "enabled": true,
+        "category": "newsletter"
+      },
+      {
+        "name": "Accelerated (a16z)",
+        "url": "https://www.readaccelerated.com/feed",
+        "enabled": true,
+        "category": "newsletter"
       }
     ],
     "hackernews": {
