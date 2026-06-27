@@ -136,9 +136,7 @@
     "twitter": {
       "enabled": false
     },
-    "github": {
-      "enabled": false
-    },
+    "github": [],
     "openbb": {
       "enabled": false
     },
@@ -150,18 +148,17 @@
     "ai_score_threshold": 6.0,
     "time_window_hours": 48,
     "max_items": null,
-    "category_groups": {
-      "ai-lab": null,
-      "ai-podcast": null,
-      "interview": null,
-      "newsletter": null,
-      "product": null
-    }
+    "category_groups": {}
   },
   "webhook": {
     "enabled": false
   },
   "email": {
-    "enabled": false
+    "enabled": false,
+    "smtp_server": "",
+    "smtp_port": 465,
+    "imap_server": "",
+    "imap_port": 993,
+    "email_address": ""
   }
 }
