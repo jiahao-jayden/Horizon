@@ -124,8 +124,7 @@ class DailySummarizer:
 
         # GitHub trending section
         if github_items:
-            result += f'<a id="github-trending"></a>\n'
-            result += f"## 🔥 {labels['github_trending']}\n\n"
+            result += f'\n## 🔥 <a id="github-trending"></a>{labels["github_trending"]}\n\n'
             for item in github_items:
                 title = str(item.metadata.get(f"title_{language}") or item.title)
                 url = str(item.url)

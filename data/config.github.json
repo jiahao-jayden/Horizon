@@ -210,7 +210,7 @@
     }
   },
   "filtering": {
-    "ai_score_threshold": 5.0,
+    "ai_score_threshold": 4.0,
     "time_window_hours": 48,
     "max_items": null,
     "category_groups": {}
