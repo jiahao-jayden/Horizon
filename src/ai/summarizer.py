@@ -27,6 +27,7 @@ LABELS = {
         "tags": "Tags",
         "selected_items": "From {total} items, {selected} important content pieces were selected",
         "empty_analyzed": "Analyzed {total} items, but none met the importance threshold.",
+        "github_trending": "GitHub Trending Today",
         "empty_body": (
             "No significant developments today. This might indicate:\n"
             "- A quiet day in your tracked sources\n"
@@ -47,6 +48,7 @@ LABELS = {
         "tags": "标签",
         "selected_items": "从 {total} 条内容中筛选出 {selected} 条重要资讯。",
         "empty_analyzed": "已分析 {total} 条内容，但没有达到重要性阈值的条目。",
+        "github_trending": "GitHub 今日热门项目",
         "empty_body": (
             "今日暂无重要动态，可能原因：\n"
             "- 今天关注的信息源较平静\n"
@@ -92,26 +94,53 @@ class DailySummarizer:
         if not items:
             return self._generate_empty_summary(date, total_fetched, labels)
 
+        # Separate GitHub trending items from main news items
+        github_items = [i for i in items if i.source_type.value == "ossinsight"]
+        main_items = [i for i in items if i.source_type.value != "ossinsight"]
+
+        render_items = main_items if main_items else items
         header = (
             f"# {labels['header']} - {date}\n\n"
-            f"> {labels['selected_items'].format(total=total_fetched, selected=len(items))}\n\n"
+            f"> {labels['selected_items'].format(total=total_fetched, selected=len(render_items))}\n\n"
             "---\n\n"
         )
 
         # TOC
         toc_entries = []
-        for i, item in enumerate(items):
+        for i, item in enumerate(render_items):
             _t = item.metadata.get(f"title_{language}") or item.title
             t = str(_t).replace("[", "(").replace("]", ")")
             if language == "zh":
                 t = _pangu(t)
             score = item.ai_score or "?"
-            toc_entries.append(f"{i + 1}. [{t}](#item-{i + 1}) \u2b50\ufe0f {score}/10")
+            toc_entries.append(f"{i + 1}. [{t}](#item-{i + 1}) ⭐️ {score}/10")
         toc = "\n".join(toc_entries) + "\n\n---\n\n"
 
-        parts = [self._format_item(item, labels, language, i + 1) for i, item in enumerate(items)]
+        parts = [self._format_item(item, labels, language, i + 1) for i, item in enumerate(render_items)]
 
-        return header + toc + "".join(parts)
+        result = header + toc + "".join(parts)
+
+        # GitHub trending section
+        if github_items:
+            result += f"## 🔥 {labels['github_trending']}\n\n"
+            for item in github_items:
+                title = str(item.metadata.get(f"title_{language}") or item.title)
+                url = str(item.url)
+                summary = (
+                    item.metadata.get(f"detailed_summary_{language}")
+                    or item.metadata.get("detailed_summary")
+                    or item.ai_summary
+                    or ""
+                )
+                if language == "zh":
+                    title = _pangu(title)
+                    summary = _pangu(summary)
+                result += f"**[{title}]({url})**"
+                if summary:
+                    result += f" — {summary}"
+                result += "\n\n"
+
+        return result
 
     def generate_webhook_overview(
         self,
