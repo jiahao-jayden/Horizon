@@ -19,12 +19,6 @@
         "category": "ai-lab"
       },
       {
-        "name": "Anthropic Blog",
-        "url": "https://www.anthropic.com/rss.xml",
-        "enabled": true,
-        "category": "ai-lab"
-      },
-      {
         "name": "Latent Space",
         "url": "https://www.latent.space/feed",
         "enabled": true,
@@ -115,14 +109,20 @@
         "category": "ai-podcast"
       },
       {
-        "name": "Every (Chain of Thought)",
-        "url": "https://every.to/feed",
+        "name": "One Useful Thing (Ethan Mollick)",
+        "url": "https://www.oneusefulthing.org/feed",
         "enabled": true,
         "category": "newsletter"
       },
       {
-        "name": "One Useful Thing (Ethan Mollick)",
-        "url": "https://www.oneusefulthing.org/feed",
+        "name": "Every - Chain of Thought (Dan Shipper)",
+        "url": "https://every.to/chain-of-thought/feed.xml",
+        "enabled": true,
+        "category": "newsletter"
+      },
+      {
+        "name": "Every - Superorganizers",
+        "url": "https://every.to/superorganizers/feed.xml",
         "enabled": true,
         "category": "newsletter"
       }
