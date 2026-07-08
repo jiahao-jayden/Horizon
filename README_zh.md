@@ -327,6 +327,7 @@ Horizon 非常适合作为 **GitHub Actions** 定时任务运行。查看 [`.git
 |--------|---------|---------|
 | **Hacker News** | 按分数排序的热门文章 | 支持（前 N 条评论） |
 | **RSS / Atom** | 任意 RSS 或 Atom 订阅源 | — |
+| **BAAI Hub** | 智源社区最新内容 | — |
 | **Reddit** | Subreddit 帖子 + 用户动态 | 支持（前 N 条评论） |
 | **Telegram** | 公开频道消息 | — |
 | **Twitter / X** | 特定用户的推文 | 支持（前 N 条回复） |

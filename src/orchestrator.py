@@ -19,6 +19,7 @@ from .services.webhook import WebhookNotifier
 from .scrapers.github import GitHubScraper
 from .scrapers.hackernews import HackerNewsScraper
 from .scrapers.rss import RSSScraper
+from .scrapers.baaihub import BAAIHubScraper
 from .scrapers.reddit import RedditScraper
 from .scrapers.telegram import TelegramScraper
 from .scrapers.twitter import TwitterScraper
@@ -323,6 +324,11 @@ class HorizonOrchestrator:
             if self.config.sources.rss:
                 rss_scraper = RSSScraper(self.config.sources.rss, client)
                 tasks.append(self._fetch_with_progress("RSS Feeds", rss_scraper, since))
+
+            # BAAI Hub
+            if self.config.sources.baaihub and self.config.sources.baaihub.enabled:
+                baaihub_scraper = BAAIHubScraper(self.config.sources.baaihub, client)
+                tasks.append(self._fetch_with_progress("BAAI Hub", baaihub_scraper, since))
 
             # Reddit
             if self.config.sources.reddit.enabled:

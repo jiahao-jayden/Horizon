@@ -160,6 +160,12 @@
         "category": "newsletter"
       }
     ],
+    "baaihub": {
+      "enabled": true,
+      "url": "https://hub.baai.ac.cn/",
+      "fetch_limit": 20,
+      "category": "ai-news"
+    },
     "hackernews": {
       "enabled": true,
       "fetch_top_stories": 20,

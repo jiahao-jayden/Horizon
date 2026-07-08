@@ -250,6 +250,21 @@ All sources are configured under the top-level `sources` key in `config.json`.
 }
 ```
 
+### BAAI Hub
+
+```json
+{
+  "sources": {
+    "baaihub": {
+      "enabled": true,
+      "url": "https://hub.baai.ac.cn/",
+      "fetch_limit": 20,
+      "category": "ai-news"
+    }
+  }
+}
+```
+
 ### Reddit
 
 Reddit scraping is free and does not require API keys. Subreddit posts and comments prefer `old.reddit.com`; JSON and RSS endpoints are used as fallbacks when needed.

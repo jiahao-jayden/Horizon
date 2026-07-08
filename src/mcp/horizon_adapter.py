@@ -20,6 +20,7 @@ VALID_SOURCES = {
     "github",
     "hackernews",
     "rss",
+    "baaihub",
     "reddit",
     "telegram",
     "twitter",
@@ -202,6 +203,8 @@ def apply_source_filter(
         clone.sources.hackernews.enabled = False
     if "rss" not in wanted:
         clone.sources.rss = []
+    if "baaihub" not in wanted:
+        clone.sources.baaihub.enabled = False
     if "reddit" not in wanted:
         clone.sources.reddit.enabled = False
         clone.sources.reddit.subreddits = []
@@ -229,6 +232,8 @@ def get_enabled_sources(config: Any) -> list[str]:
         enabled.append("hackernews")
     if getattr(config.sources, "rss", None):
         enabled.append("rss")
+    if getattr(getattr(config.sources, "baaihub", None), "enabled", False):
+        enabled.append("baaihub")
     if getattr(config.sources.reddit, "enabled", False):
         enabled.append("reddit")
     if getattr(config.sources.telegram, "enabled", False):

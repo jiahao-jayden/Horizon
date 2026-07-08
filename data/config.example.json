@@ -54,6 +54,12 @@
         "category": "linux"
       }
     ],
+    "baaihub": {
+      "enabled": false,
+      "url": "https://hub.baai.ac.cn/",
+      "fetch_limit": 20,
+      "category": "ai-news"
+    },
     "reddit": {
       "enabled": true,
       "subreddits": [

@@ -89,6 +89,25 @@ Fetches any Atom/RSS feed using the `feedparser` library. Tries multiple date fi
 
 **Extracted data**: title, URL, author, content (from `summary`/`description`/`content` fields), feed name, category, and entry tags.
 
+## BAAI Hub
+
+**File**: `src/scrapers/baaihub.py`
+
+Fetches the latest stories from BAAI Hub (`https://hub.baai.ac.cn/`) by reading the Nuxt SSR payload embedded in the homepage HTML. This is a site-specific source because BAAI Hub does not expose a standard RSS/Atom feed.
+
+**Config** (`sources.baaihub`):
+
+```json
+{
+  "enabled": true,
+  "url": "https://hub.baai.ac.cn/",
+  "fetch_limit": 20,
+  "category": "ai-news"
+}
+```
+
+**Extracted data**: title, original URL, author, summary/content, cover URL, tags, category, and Hub detail URL.
+
 ## Reddit
 
 **File**: `src/scrapers/reddit.py`

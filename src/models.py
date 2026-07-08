@@ -12,6 +12,7 @@ class SourceType(str, Enum):
     GITHUB = "github"
     HACKERNEWS = "hackernews"
     RSS = "rss"
+    BAAIHUB = "baaihub"
     REDDIT = "reddit"
     TELEGRAM = "telegram"
     TWITTER = "twitter"
@@ -138,6 +139,15 @@ class RSSSourceConfig(BaseModel):
     url: HttpUrl
     enabled: bool = True
     category: Optional[str] = None
+
+
+class BAAIHubConfig(BaseModel):
+    """BAAI Hub source configuration."""
+
+    enabled: bool = False
+    url: HttpUrl = Field(default="https://hub.baai.ac.cn/", validate_default=True)
+    fetch_limit: int = Field(default=20, gt=0)
+    category: Optional[str] = "ai-news"
 
 
 class RedditSubredditConfig(BaseModel):
@@ -270,6 +280,7 @@ class SourcesConfig(BaseModel):
     github: List[GitHubSourceConfig] = Field(default_factory=list)
     hackernews: HackerNewsConfig = Field(default_factory=HackerNewsConfig)
     rss: List[RSSSourceConfig] = Field(default_factory=list)
+    baaihub: BAAIHubConfig = Field(default_factory=BAAIHubConfig)
     reddit: RedditConfig = Field(default_factory=RedditConfig)
     telegram: TelegramConfig = Field(default_factory=TelegramConfig)
     twitter: Optional[TwitterConfig] = None

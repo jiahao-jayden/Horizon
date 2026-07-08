@@ -338,6 +338,7 @@ Horizon works great as a **GitHub Actions** cron job. See [`.github/workflows/da
 |--------|----------------|----------|
 | **Hacker News** | Top stories by score | Yes (top N comments) |
 | **RSS / Atom** | Any RSS or Atom feed | — |
+| **BAAI Hub** | Latest BAAI Hub stories | — |
 | **Reddit** | Subreddits + user posts | Yes (top N comments) |
 | **Telegram** | Public channel messages | — |
 | **Twitter / X** | Tweets from specific users | Yes (top N replies) |
