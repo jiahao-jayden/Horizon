@@ -35,3 +35,22 @@ def test_rss_ids_are_deterministic() -> None:
 
     assert first == second
     assert first == "rss:example.com_feed.xml:5e2d5d1e58e94d76"
+
+
+def test_rss_feed_url_expands_environment_variables(monkeypatch) -> None:
+    response = MagicMock()
+    response.text = "<rss><channel></channel></rss>"
+    response.raise_for_status.return_value = None
+    client = AsyncMock()
+    client.get.return_value = response
+    monkeypatch.setenv("RSS_HOST", " example.com ")
+    source = RSSSourceConfig(name="Test", url="https://example.com/feed.xml")
+    source.url = "https://${RSS_HOST}/feed.xml"
+    scraper = RSSScraper([source], client)
+
+    asyncio.run(scraper.fetch(datetime(2026, 4, 24, tzinfo=timezone.utc)))
+
+    client.get.assert_awaited_once_with(
+        "https://example.com/feed.xml",
+        follow_redirects=True,
+    )
