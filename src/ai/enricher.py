@@ -7,6 +7,7 @@ For items that pass the score threshold, this module:
 
 import asyncio
 import json
+import logging
 import re
 import sys
 import os
@@ -22,6 +23,8 @@ from .prompts import (
 )
 from .utils import parse_json_response
 from ..models import ContentItem
+
+logger = logging.getLogger(__name__)
 
 
 class ContentEnricher:
@@ -50,7 +53,7 @@ class ContentEnricher:
                 try:
                     await self._enrich_item(item)
                 except Exception as e:
-                    print(f"Error enriching item {item.id}: {e}, falling back to translation")
+                    logger.warning("Error enriching item %s: %s, falling back to translation", item.id, e)
                     await self._translate_item(item)
             progress.advance(progress_task)
 
@@ -83,7 +86,8 @@ class ContentEnricher:
             finally:
                 sys.stderr.close()
                 sys.stderr = stderr
-        except Exception:
+        except Exception as e:
+            logger.warning("Web search failed for %r: %s", query, e)
             return []
 
         return [
@@ -126,7 +130,8 @@ class ContentEnricher:
                 return []
             queries = result.get("queries", [])
             return queries[:3]
-        except Exception:
+        except Exception as e:
+            logger.warning("Concept extraction failed for item %s: %s", item.id, e)
             return []
 
     @retry(
@@ -195,7 +200,7 @@ class ContentEnricher:
         if result is None:
             # Gracefully degrade: fall back to a lightweight translation
             # instead of dropping the item untranslated.
-            print(f"Warning: could not parse enrichment response for {item.id}, falling back to translation")
+            logger.warning("Could not parse enrichment response for %s, falling back to translation", item.id)
             await self._translate_item(item)
             return
 
@@ -255,5 +260,5 @@ class ContentEnricher:
                     item.metadata["title_zh"] = result["title_zh"]
                 if result.get("summary_zh"):
                     item.metadata["detailed_summary_zh"] = result["summary_zh"]
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("Translation fallback failed for item %s: %s", item.id, e)

@@ -1,12 +1,15 @@
 """AI-powered source recommendation for the setup wizard."""
 
 import asyncio
+import logging
 from typing import List, Dict, Optional
 
 from ..ai.client import create_ai_client
 from ..ai.utils import parse_json_response
 from ..models import AIConfig
 from .prompts import RECOMMEND_SYSTEM, RECOMMEND_USER
+
+logger = logging.getLogger(__name__)
 
 
 async def get_ai_recommendations(
@@ -26,7 +29,8 @@ async def get_ai_recommendations(
     """
     try:
         client = create_ai_client(ai_config)
-    except (ValueError, Exception):
+    except Exception as e:
+        logger.warning("Could not create AI client for recommendations: %s", e)
         return []
 
     # Format existing sources for the prompt
@@ -46,7 +50,8 @@ async def get_ai_recommendations(
             system=RECOMMEND_SYSTEM,
             user=user_prompt,
         )
-    except Exception:
+    except Exception as e:
+        logger.warning("AI recommendation request failed: %s", e)
         return []
 
     result = parse_json_response(response)
