@@ -16,6 +16,10 @@ from ..models import Config
 # (ASCII letters, digits, underscore; must not start with a digit).
 _ENV_VAR_PATTERN = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
 
+# Allowed characters for the ``date``/``language`` tokens embedded in summary
+# filenames. Prevents path traversal (``..``, ``/``) via those values.
+_SUMMARY_TOKEN_RE = re.compile(r"[A-Za-z0-9_-]+")
+
 
 def _expand_env_vars(value: Any) -> Any:
     """Recursively expand ``${VAR}`` references inside any string leaves.
@@ -109,6 +113,11 @@ class StorageManager:
         return self.config_path
 
     def save_daily_summary(self, date: str, markdown: str, language: str = "en") -> Path:
+        if not _SUMMARY_TOKEN_RE.fullmatch(date):
+            raise ValueError(f"Invalid date for summary filename: {date!r}")
+        if not _SUMMARY_TOKEN_RE.fullmatch(language):
+            raise ValueError(f"Invalid language for summary filename: {language!r}")
+
         filename = f"horizon-{date}-{language}.md"
         filepath = self.summaries_dir / filename
 

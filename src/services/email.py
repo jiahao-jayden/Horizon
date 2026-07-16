@@ -16,7 +16,7 @@ try:
 except ImportError:
     markdown = None
 
-from ..ai.markdown_utils import clean_app_summary_markdown
+from ..ai.markdown_utils import clean_app_summary_markdown, sanitize_rendered_html_urls
 from ..models import EmailConfig
 
 logger = logging.getLogger(__name__)
@@ -159,10 +159,12 @@ class EmailManager:
         cleaned_summary = clean_app_summary_markdown(summary_md)
         safe_summary = html.escape(cleaned_summary)
         html_content = (
-            markdown.markdown(safe_summary)
+            sanitize_rendered_html_urls(markdown.markdown(safe_summary))
             if markdown
             else f"<pre>{safe_summary}</pre>"
         )
+        safe_sender_name = html.escape(self.config.sender_name)
+        safe_unsubscribe_keyword = html.escape(self.config.unsubscribe_keyword)
 
         html_body = f"""
         <!DOCTYPE html>
@@ -181,8 +183,8 @@ class EmailManager:
         <body>
             {html_content}
             <div class="footer">
-                <p>Sent by {self.config.sender_name}</p>
-                <p>To unsubscribe, please reply with "{self.config.unsubscribe_keyword}"</p>
+                <p>Sent by {safe_sender_name}</p>
+                <p>To unsubscribe, please reply with "{safe_unsubscribe_keyword}"</p>
             </div>
         </body>
         </html>
