@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import logging
 import re
 from typing import List, Optional
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -11,6 +12,8 @@ from .client import AIClient
 from .prompts import CONTENT_ANALYSIS_SYSTEM, CONTENT_ANALYSIS_USER
 from .utils import parse_json_response
 from ..models import ContentItem
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_THROTTLE_SEC = 0.0
 
@@ -51,7 +54,7 @@ class ContentAnalyzer:
                 try:
                     await self._analyze_item(item)
                 except Exception as e:
-                    print(f"Error analyzing item {item.id}: {e}")
+                    logger.warning("Error analyzing item %s: %s", item.id, e)
                     item.ai_score = 0.0
                     item.ai_reason = "Analysis failed"
                     item.ai_summary = item.title
