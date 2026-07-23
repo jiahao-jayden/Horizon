@@ -3,8 +3,6 @@
 import calendar
 import hashlib
 import logging
-import os
-import re
 from datetime import datetime, timezone
 from typing import List
 from email.utils import parsedate_to_datetime
@@ -12,6 +10,7 @@ import httpx
 import feedparser
 
 from .base import BaseScraper
+from ..config_utils import expand_env_vars
 from ..models import ContentItem, SourceType, RSSSourceConfig
 
 logger = logging.getLogger(__name__)
@@ -66,10 +65,8 @@ class RSSScraper(BaseScraper):
 
         try:
             # Expand environment variables in URL (e.g. ${LWN_TOKEN})
-            feed_url = re.sub(
-                r"\$\{(\w+)\}",
-                lambda m: os.environ.get(m.group(1), m.group(0)).strip(),
-                str(source.url),
+            feed_url = str(
+                expand_env_vars(str(source.url), strip_values=True)
             )
 
             # Fetch feed content

@@ -6,13 +6,10 @@ For items that pass the score threshold, this module:
 """
 
 import asyncio
-import json
-import re
 import sys
 import os
 from typing import List, Optional
 from tenacity import retry, stop_after_attempt, wait_exponential
-from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, MofNCompleteColumn
 from ddgs import DDGS
 
 from .client import AIClient
@@ -20,7 +17,7 @@ from .prompts import (
     CONCEPT_EXTRACTION_SYSTEM, CONCEPT_EXTRACTION_USER,
     CONTENT_ENRICHMENT_SYSTEM, CONTENT_ENRICHMENT_USER,
 )
-from .utils import parse_json_response
+from .utils import parse_json_response, run_with_progress
 from ..models import ContentItem
 
 
@@ -43,29 +40,20 @@ class ContentEnricher:
             items: Content items to enrich (modified in-place)
         """
         concurrency = self._get_concurrency()
-        semaphore = asyncio.Semaphore(concurrency)
 
-        async def _process(item: ContentItem, progress_task) -> None:
-            async with semaphore:
-                try:
-                    await self._enrich_item(item)
-                except Exception as e:
-                    print(f"Error enriching item {item.id}: {e}, falling back to translation")
-                    await self._translate_item(item)
-            progress.advance(progress_task)
+        async def _process(item: ContentItem, _index: int) -> None:
+            try:
+                await self._enrich_item(item)
+            except Exception as e:
+                print(f"Error enriching item {item.id}: {e}, falling back to translation")
+                await self._translate_item(item)
 
-        with Progress(
-            SpinnerColumn(),
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            MofNCompleteColumn(),
-            transient=True,
-        ) as progress:
-            task = progress.add_task("Enriching", total=len(items))
-            coros = [
-                _process(item, task) for item in items
-            ]
-            await asyncio.gather(*coros)
+        await run_with_progress(
+            items,
+            _process,
+            concurrency=concurrency,
+            description="Enriching",
+        )
 
     async def _web_search(self, query: str, max_results: int = 3) -> list:
         """Search the web for context via DuckDuckGo.
