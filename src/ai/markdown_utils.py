@@ -101,3 +101,38 @@ def clean_app_summary_markdown(value: str) -> str:
     """
     value = _ANCHOR_ID_RE.sub("", value)
     return _convert_details_to_markdown(value)
+
+
+_HTML_URL_ATTR_RE = re.compile(
+    r"""(?P<attr>\b(?:href|src)\s*=\s*)(?P<quote>["'])(?P<url>.*?)(?P=quote)""",
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def _url_scheme(url: str) -> str | None:
+    """Return the lowercased scheme of *url*, or None if it is scheme-relative."""
+    cleaned = html.unescape(url).strip()
+    # Strip control/whitespace characters that browsers ignore when parsing
+    # schemes (e.g. "java\tscript:") so obfuscated payloads can't slip through.
+    cleaned = re.sub(r"[\x00-\x20]", "", cleaned)
+    match = re.match(r"^([A-Za-z][A-Za-z0-9+.-]*):", cleaned)
+    return match.group(1).lower() if match else None
+
+
+def sanitize_rendered_html_urls(html_str: str) -> str:
+    """Neutralize dangerous URL schemes in ``href``/``src`` attributes.
+
+    Rendered Markdown may contain attacker-influenced links (e.g. summaries
+    derived from scraped titles), so links such as ``javascript:`` or
+    ``data:`` must not survive into HTML that is delivered to users. Relative
+    and scheme-relative URLs are preserved; only URLs whose scheme is outside
+    the allowlist are dropped.
+    """
+
+    def _replace(match: re.Match) -> str:
+        scheme = _url_scheme(match.group("url"))
+        if scheme is None or scheme in _SAFE_URL_SCHEMES:
+            return match.group(0)
+        return f'{match.group("attr")}{match.group("quote")}{match.group("quote")}'
+
+    return _HTML_URL_ATTR_RE.sub(_replace, html_str)

@@ -126,3 +126,24 @@ def test_load_config_expands_env_vars_in_ai_base_url(tmp_path, monkeypatch):
     storage = StorageManager(data_dir=str(tmp_path))
     config = storage.load_config()
     assert config.ai.base_url == "https://private-proxy.example/v1"
+
+
+def test_save_daily_summary_writes_expected_file(tmp_path):
+    storage = StorageManager(data_dir=str(tmp_path))
+    path = storage.save_daily_summary("2026-01-02", "# Hi", language="en")
+    assert path == storage.summaries_dir / "horizon-2026-01-02-en.md"
+    assert path.read_text(encoding="utf-8") == "# Hi"
+
+
+@pytest.mark.parametrize(
+    "date,language",
+    [
+        ("../../etc/passwd", "en"),
+        ("2026-01-02", "../secret"),
+        ("2026/01/02", "en"),
+    ],
+)
+def test_save_daily_summary_rejects_path_traversal(tmp_path, date, language):
+    storage = StorageManager(data_dir=str(tmp_path))
+    with pytest.raises(ValueError):
+        storage.save_daily_summary(date, "payload", language=language)

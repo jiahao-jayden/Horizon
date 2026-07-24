@@ -163,6 +163,34 @@ def test_send_daily_summary_does_not_link_unsafe_details_href(monkeypatch):
     assert "click [me](https://evil.example)" in html_body
 
 
+def test_send_daily_summary_strips_unsafe_markdown_link_schemes(monkeypatch):
+    monkeypatch.setenv("EMAIL_PASSWORD", "secret")
+    monkeypatch.setattr("src.services.email.smtplib.SMTP_SSL", FakeSMTP)
+    FakeSMTP.instances = []
+
+    manager = EmailManager(_email_config())
+    summary = (
+        "# Daily\n\n"
+        "See [click me](javascript:alert(1)) and "
+        "![x](data:text/html;base64,PHN2Zz4=) plus "
+        "[safe](https://ok.example)."
+    )
+
+    manager.send_daily_summary(summary, "Daily", ["user@example.com"])
+
+    html_body = (
+        FakeSMTP.instances[0]
+        .messages[0]
+        .get_payload()[1]
+        .get_payload(decode=True)
+        .decode()
+    )
+
+    assert "javascript:alert(1)" not in html_body
+    assert "data:text/html" not in html_body
+    assert '<a href="https://ok.example">safe</a>' in html_body
+
+
 def test_check_subscriptions_skips_imap_when_disabled(monkeypatch):
     monkeypatch.setenv("EMAIL_PASSWORD", "secret")
     monkeypatch.setattr("src.services.email.imaplib.IMAP4_SSL", FakeIMAP)
