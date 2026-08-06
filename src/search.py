@@ -1,11 +1,14 @@
 """Search HN Algolia and Reddit for related stories."""
 
 import asyncio
+import logging
 from typing import List, Dict
 
 import httpx
 
 from .models import ContentItem
+
+logger = logging.getLogger(__name__)
 
 HN_SEARCH_URL = "https://hn.algolia.com/api/v1/search"
 REDDIT_SEARCH_URL = "https://www.reddit.com/search.json"
@@ -20,7 +23,8 @@ async def search_hn(query: str, client: httpx.AsyncClient) -> List[dict]:
         resp = await client.get(HN_SEARCH_URL, params=params)
         resp.raise_for_status()
         data = resp.json()
-    except Exception:
+    except Exception as e:
+        logger.warning("HN search failed for %r: %s", query, e)
         return []
 
     results = []
@@ -45,7 +49,8 @@ async def search_reddit(query: str, client: httpx.AsyncClient) -> List[dict]:
             resp = await client.get(REDDIT_SEARCH_URL, params=params, headers=headers)
             resp.raise_for_status()
             data = resp.json()
-    except Exception:
+    except Exception as e:
+        logger.warning("Reddit search failed for %r: %s", query, e)
         return []
 
     results = []
