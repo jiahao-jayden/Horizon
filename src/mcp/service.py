@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -24,6 +25,8 @@ from .horizon_adapter import (
 )
 from .run_store import RunStore
 from ..services.webhook import WebhookNotifier
+
+logger = logging.getLogger(__name__)
 
 
 def _default_runs_root() -> Path:
@@ -614,7 +617,12 @@ class HorizonPipelineService:
         try:
             raw = self.run_store.load_items(run_id, "raw")
             return len(raw)
-        except Exception:
+        except FileNotFoundError:
+            return fallback
+        except Exception as exc:
+            logger.warning(
+                "Could not determine total fetched for run %s: %s", run_id, exc
+            )
             return fallback
 
     @staticmethod

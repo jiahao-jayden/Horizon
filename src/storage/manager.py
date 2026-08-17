@@ -1,6 +1,7 @@
 """Storage manager for configuration and state persistence."""
 
 import json
+import logging
 import os
 import re
 import shutil
@@ -10,6 +11,8 @@ from typing import Any
 from pydantic import ValidationError
 
 from ..models import Config
+
+logger = logging.getLogger(__name__)
 
 
 # Matches ${VAR_NAME} in string config values. Names follow env-var rules
@@ -126,7 +129,8 @@ class StorageManager:
         try:
             with open(subscribers_path, "r", encoding="utf-8") as f:
                 return json.load(f)
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
+            logger.warning("Invalid JSON in subscribers file %s: %s", subscribers_path, e)
             return []
 
     def add_subscriber(self, email_addr: str):

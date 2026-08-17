@@ -72,8 +72,10 @@ class HorizonOrchestrator:
             if os.path.exists(self._SEEN_IDS_FILE):
                 with open(self._SEEN_IDS_FILE) as f:
                     return set(json.load(f).get("ids", []))
-        except Exception:
-            pass
+        except (OSError, ValueError, json.JSONDecodeError) as e:
+            self.console.print(
+                f"[yellow]Warning: could not load seen IDs from {self._SEEN_IDS_FILE}: {e}[/yellow]"
+            )
         return set()
 
     def _save_seen_ids(self, old_ids: Set[str], new_ids: Set[str]) -> None:
